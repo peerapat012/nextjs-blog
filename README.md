@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# learn-blog (Next.js + MongoDB + TypeORM)
 
-## Getting Started
+A simple blog app built for learning Next.js (App Router) with MongoDB + TypeORM.
 
-First, run the development server:
+## What it does
+
+- Home page lists blog posts (latest first).
+- Create page lets you publish a new post.
+- Post page shows the post and its comments.
+- You can add comments to a post (the page refreshes after posting).
+
+## Tech Stack
+
+- `next` (App Router)
+- `mongodb` (database)
+- `typeorm` (MongoDB entity mapping + repository queries)
+- `tailwindcss` (basic styling)
+
+## Project Structure (high level)
+
+- `app/`
+  - `app/page.tsx`: list posts
+  - `app/posts/new/page.tsx`: create a post
+  - `app/posts/[id]/page.tsx`: view a post + its comments
+  - `app/api/posts/*`: posts CRUD (GET/POST and GET/DELETE by id)
+  - `app/api/comments`: list + create comments (`?postId=...`)
+- `components/`
+  - `CommentList.tsx`: renders comments
+  - `CommentForm.tsx`: posts a comment + refreshes the page
+- `lib/`
+  - `lib/db.ts`: TypeORM `DataSource` (singleton) configured for MongoDB
+  - `lib/entities/Post.ts`: `Post` entity
+  - `lib/entities/Comment.ts`: `Comment` entity
+
+## Install & Run
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Configure MongoDB connection:
+
+- Create a `.env.local` file in the project root.
+- Add your MongoDB connection string:
+
+```bash
+MONGODB_URI="mongodb://<user>:<pass>@<host>/<db>?ssl=true"
+```
+
+Notes:
+
+- The TypeORM config uses `database: "blog"` in `lib/db.ts`.
+- `lib/db.ts` enables `synchronize: true` (creates collections based on entities; good for learning).
+
+3. Start the dev server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4. Open the app:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `http://localhost:3000`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## API Endpoints (used by the UI)
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `GET /api/posts`: list posts (newest first)
+- `POST /api/posts`: create a post
+- `GET /api/posts/:id`: fetch a single post
+- `DELETE /api/posts/:id`: delete a post
+- `GET /api/comments?postId=...`: list comments for a post
+- `POST /api/comments`: create a comment (`postId`, `author`, `body`)
